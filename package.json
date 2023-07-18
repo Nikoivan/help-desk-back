@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "prestart": "npm install",
+    "lint": "eslint . --fix",
     "start": "nodemon server.js",
     "watch": "nodemon -w server.js"
   },
@@ -16,5 +17,13 @@
     "moment": "^2.29.4",
     "nodemon": "^3.0.0",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.9",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-jest": "^27.2.3",
+    "eslint-plugin-prettier": "^5.0.0"
   }
 }

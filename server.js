@@ -15,7 +15,7 @@ app.use(
   koaBody({
     urlencoded: true,
     multipart: true,
-  })
+  }),
 );
 
 app.use((ctx, next) => {
@@ -26,7 +26,7 @@ app.use((ctx, next) => {
   ctx.response.set("Access-Control-Allow-Origin", "*");
   ctx.response.set(
     "Access-Control-Allow-Methods",
-    "DELETE, PUT, PATCH, GET, POST"
+    "DELETE, PUT, PATCH, GET, POST",
   );
 
   ctx.response.status = 204;
@@ -36,37 +36,66 @@ app.use((ctx, next) => {
   if (ctx.request.method === "POST" || ctx.request.method === "GET") {
     ctx.response.set("Access-Control-Allow-Origin", "*");
 
-    const { method, id } = ctx.request.query;
-    let result;
+    try {
+      const { method, id } = ctx.request.query;
+      let result;
 
-    if (ctx.request.method === "GET") {
-      if (id) {
-        result = tc[method](id);
+      if (ctx.request.method === "GET") {
+        if (id) {
+          result = tc[method](id);
+        } else {
+          result = tc[method]();
+        }
       } else {
-        result = tc[method]();
-      }
-    } else {
-      const data = ctx.request.body;
-      if (
-        method === "createTicket" &&
-        tc.allTickets().some((item) => item.name === data.name)
-      ) {
-        ctx.response.status = 400;
-        ctx.response.body = { err: "Ticket with this name exists" };
+        const data = ctx.request.body;
 
-        return;
+        if (tc.allTickets().some((item) => item.name === data.name)) {
+          ctx.response.status = 400;
+          ctx.response.body = { err: "Ticket with this name exists" };
+
+          return;
+        }
+        if (!id) {
+          data.id = uuid.v4();
+          result = tc[method](data);
+        } else {
+          result = tc[method](+id, data);
+        }
       }
-      if (!id) {
-        //data.id = uuid.v4();
-        data.id = 5;
-        result = tc[method](data);
-      } else {
-        result = tc[method](+id, data);
-      }
+
+      ctx.response.body = result;
+
+      ctx.response.status = 200;
+    } catch (e) {
+      console.log(`error ${e}`);
     }
-    console.log(result);
+  }
+
+  next();
+});
+
+app.use((ctx, next) => {
+  if (ctx.request.method !== "PUT") {
+    next();
+    return;
+  }
+  try {
+    ctx.response.set("Access-Control-Allow-Origin", "*");
+    const { method, id } = ctx.request.query;
+    const data = ctx.request.body;
+
+    if (tc.allTickets().every((item) => item.id !== id)) {
+      ctx.response.status = 400;
+      ctx.response.body = { err: "Ticket with it id don't exists" };
+      next();
+      return;
+    }
+    const result = tc[method](id, data);
+
     ctx.response.body = result;
     ctx.response.status = 200;
+  } catch (e) {
+    console.log(e);
   }
 
   next();
@@ -78,21 +107,25 @@ app.use((ctx, next) => {
 
     return;
   }
-  const { method, id } = ctx.request.query;
 
-  ctx.response.set("Access-Control-Allow-Origin", "*");
+  try {
+    const { method, id } = ctx.request.query;
 
-  if (tc.allTickets().every((item) => item.getId() !== +id)) {
-    ctx.response.status = 400;
-    ctx.response.body = { err: "Ticket with it id don't exists" };
-    next();
-    return;
+    ctx.response.set("Access-Control-Allow-Origin", "*");
+    if (tc.allTickets().some((item) => item.id !== id)) {
+      ctx.response.status = 400;
+      ctx.response.body = { err: "Ticket with it id don't exists" };
+      next();
+      return;
+    }
+
+    const result = tc[method](id);
+
+    ctx.response.body = result;
+    ctx.response.status = 200;
+  } catch (e) {
+    console.log(e);
   }
-
-  const result = tc[method](+id);
-  console.log(result);
-  ctx.response.body = result;
-  ctx.response.status = 200;
 
   next();
 });

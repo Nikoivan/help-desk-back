@@ -4,6 +4,7 @@ class Storage {
   }
 
   allTickets() {
+    console.log(this.storage);
     return this.storage;
   }
 
@@ -12,19 +13,20 @@ class Storage {
   }
 
   getById(id) {
-    return this.storage.find((el) => el.getId() === id);
+    const result = this.storage.find((el) => el.id === id);
+    return result;
   }
 
   removeById(id) {
     const ticket = this.storage.find((el) => el.id === id);
-    console.log(ticket);
     if (!ticket) {
-      return null;
+      return { err: "Ticket with this id isn't found" };
     }
+
     this.storage = this.storage.filter((el) => {
       el.id !== id;
     });
-    return { status: "deleted" };
+    return { type: "deleted", id };
   }
 
   get show() {

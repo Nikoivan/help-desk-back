@@ -4,32 +4,33 @@ class Controller {
     this.ItemType = Item;
   }
 
-  /*callback(settings) {
-    console.log("callback 1");
-    const { method, ...data } = settings;
-
-    return this[method](data);
-  }*/
-
-  allTickets(data = null) {
-    return this.storage.allTickets();
+  allTickets() {
+    const arr = [];
+    this.storage.allTickets().forEach((el) => {
+      const item = el.data;
+      arr.push(item);
+    });
+    return arr;
   }
 
   createTicket(data) {
     data.status = "new";
     const ticket = new this.ItemType(data);
     this.storage.add(ticket);
-    console.log(this.storage.allTickets());
 
-    return { status: "created" };
+    if (!ticket) {
+      return { err: "Error in method createTicket" };
+    }
+
+    return { type: "create", ticket: ticket.data };
   }
 
   ticketById(id) {
-    const result = this.storage.getById(id);
-    if (!result) {
+    const ticket = this.storage.getById(id);
+    if (!ticket) {
       return { err: "Тикета с данным id не существует" };
     }
-    return result;
+    return ticket.description;
   }
 
   deleteById(id) {
@@ -38,22 +39,22 @@ class Controller {
     if (!result) {
       return { err: "Тикета с данным id не существует" };
     }
-    console.log(this.storage.allTickets());
+
     return result;
   }
 
   updateById(id, data) {
     const ticket = this.storage.getById(id);
-    console.log(ticket);
     if (!ticket) {
       return { err: "Тикета с данным id не существует" };
     }
 
-    const result = ticket.update(data);
-    if (result.err !== undefined) {
-      return { err: result.err };
+    let result;
+    if (!data.status) {
+      result = ticket.update(data);
+    } else {
+      result = ticket.changeStatus(data.status);
     }
-    console.log(this.storage.allTickets());
     return result;
   }
 }

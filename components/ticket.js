@@ -6,8 +6,29 @@ class Ticket {
     this.id = id;
     this.name = name;
     this.status = status;
-    this.description = description;
-    this.timeStamp = moment().format("YYYY-MM-DD");
+    this._description = description;
+    this.created = `${moment().format(
+      "DD-MM-YY",
+    )} ${moment().hour()}:${moment().minutes()}`;
+  }
+
+  get description() {
+    return { type: "description", description: this._description, id: this.id };
+  }
+
+  get data() {
+    return {
+      type: "ticket",
+      id: this.id,
+      name: this.name,
+      status: this.status,
+      created: this.created,
+    };
+  }
+
+  changeStatus(status) {
+    this.status = status;
+    return { type: "status", status: "done", id: this.id };
   }
 
   update(data) {
@@ -15,19 +36,15 @@ class Ticket {
     if (name !== this.name) {
       this.name = name;
     }
-    if (description !== this.description) {
-      this.description = description;
+    if (description !== this._description) {
+      this._description = description;
     }
 
-    return { status: updated };
+    return { type: "update", ticket: this.data };
   }
 
   getId() {
     return this.id;
-  }
-
-  remove() {
-    this.remove();
   }
 }
 
