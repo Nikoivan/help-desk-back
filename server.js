@@ -15,7 +15,7 @@ app.use(
   koaBody({
     urlencoded: true,
     multipart: true,
-  }),
+  })
 );
 
 app.use((ctx, next) => {
@@ -26,7 +26,7 @@ app.use((ctx, next) => {
   ctx.response.set("Access-Control-Allow-Origin", "*");
   ctx.response.set(
     "Access-Control-Allow-Methods",
-    "DELETE, PUT, PATCH, GET, POST",
+    "DELETE, PUT, PATCH, GET, POST"
   );
 
   ctx.response.status = 204;
@@ -91,6 +91,7 @@ app.use((ctx, next) => {
       return;
     }
     const result = tc[method](id, data);
+    console.log(result);
 
     ctx.response.body = result;
     ctx.response.status = 200;
@@ -112,7 +113,8 @@ app.use((ctx, next) => {
     const { method, id } = ctx.request.query;
 
     ctx.response.set("Access-Control-Allow-Origin", "*");
-    if (tc.allTickets().some((item) => item.id !== id)) {
+
+    if (tc.allTickets().every((item) => item.id !== id)) {
       ctx.response.status = 400;
       ctx.response.body = { err: "Ticket with it id don't exists" };
       next();
@@ -123,6 +125,8 @@ app.use((ctx, next) => {
 
     ctx.response.body = result;
     ctx.response.status = 200;
+
+    console.log(tc.allTickets());
   } catch (e) {
     console.log(e);
   }

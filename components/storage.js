@@ -1,36 +1,33 @@
 class Storage {
   constructor() {
-    this.storage = [];
+    this.storages = [];
   }
 
   allTickets() {
-    console.log(this.storage);
-    return this.storage;
+    return this.storages;
   }
 
   add(element) {
-    this.storage.push(element);
+    this.storages.push(element);
   }
 
   getById(id) {
-    const result = this.storage.find((el) => el.id === id);
-    return result;
+    return this.storages.find((el) => el.id === id);
   }
 
   removeById(id) {
-    const ticket = this.storage.find((el) => el.id === id);
+    const ticket = this.storages.find((el) => el.id === id);
     if (!ticket) {
       return { err: "Ticket with this id isn't found" };
     }
 
-    this.storage = this.storage.filter((el) => {
-      el.id !== id;
-    });
+    this.storages = this.storages.filter((el) => el.id !== id);
+
     return { type: "deleted", id };
   }
 
   get show() {
-    return this.storage;
+    return this.storages;
   }
 }
 

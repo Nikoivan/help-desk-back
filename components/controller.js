@@ -55,6 +55,7 @@ class Controller {
     } else {
       result = ticket.changeStatus(data.status);
     }
+
     return result;
   }
 }

@@ -8,12 +8,17 @@ class Ticket {
     this.status = status;
     this._description = description;
     this.created = `${moment().format(
-      "DD-MM-YY",
+      "DD-MM-YY"
     )} ${moment().hour()}:${moment().minutes()}`;
   }
 
   get description() {
-    return { type: "description", description: this._description, id: this.id };
+    return {
+      type: "description",
+      name: this.name,
+      description: this._description,
+      id: this.id,
+    };
   }
 
   get data() {
@@ -40,7 +45,7 @@ class Ticket {
       this._description = description;
     }
 
-    return { type: "update", ticket: this.data };
+    return { type: "update", id: this.id, ticket: this.data };
   }
 
   getId() {
